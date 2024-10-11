@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: kpax_postgres
+    environment:
+      POSTGRES_USER: kpax_api
+      POSTGRES_PASSWORD: kpax
+      POSTGRES_DB: kpax_db
+    ports:
+      - "5437:5432"
