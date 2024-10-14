@@ -23,9 +23,7 @@ export class AuthService {
   async signin(signinDto: SigninDto) {
     const { email, password } = signinDto;
 
-    const user = await this.userRepo.findUnique({
-      where: { email },
-    });
+    const user = await this.userRepo.findUnique({ where: { email } });
 
     if (!user) {
       throw new UnauthorizedException('Invalid Credentials');
@@ -42,14 +40,13 @@ export class AuthService {
       user.role,
       user.isPremium,
     );
-
     const refreshToken = await this.generateRefreshToken(user.id);
 
     await this.refreshTokenRepository.create({
       data: {
         token: refreshToken,
         user: { connect: { id: user.id } },
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
         isActive: true,
       },
     });
@@ -60,8 +57,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        isPremium: false,
-        createdAt: user.createdAt,
+        isPremium: user.isPremium,
       },
     };
   }
@@ -119,45 +115,55 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string) {
-    try {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: env.jwtSecret,
-      });
+    const storedToken = await this.refreshTokenRepository.findFirst({
+      where: {
+        token: refreshToken,
+        isActive: true,
+      },
+    });
 
-      const user = await this.userRepo.findUnique({
-        where: { id: payload.sub },
-      });
-
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      const newAccessToken = await this.generateAccessToken(
-        user.id,
-        user.role,
-        user.isPremium,
-      );
-
-      const newRefreshToken = await this.generateRefreshToken(user.id);
-
-      await this.refreshTokenRepository.create({
-        data: {
-          token: newRefreshToken,
-          user: { connect: { id: user.id } },
-          expiresAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 dia de expiração
-          isActive: true,
-        },
-      });
-
-      return {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      };
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
+    if (!storedToken) {
+      throw new UnauthorizedException('Invalid refresh token.');
     }
-  }
 
+    if (new Date() > storedToken.expiresAt) {
+      await this.refreshTokenRepository.delete({ id: storedToken.id });
+      throw new UnauthorizedException('Expired refresh token.');
+    }
+
+    const payload = await this.jwtService.verifyAsync(refreshToken, {
+      secret: env.refreshToken,
+    });
+
+    const user = await this.userRepo.findUnique({ where: { id: payload.sub } });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+
+    const newAccessToken = await this.generateAccessToken(
+      user.id,
+      user.role,
+      user.isPremium,
+    );
+    const newRefreshToken = await this.generateRefreshToken(user.id);
+
+    await this.refreshTokenRepository.create({
+      data: {
+        token: newRefreshToken,
+        user: { connect: { id: user.id } },
+        expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+        isActive: true,
+      },
+    });
+
+    await this.refreshTokenRepository.delete({ id: storedToken.id });
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    };
+  }
   private generateAccessToken(
     userId: string,
     userRole: string,
@@ -170,7 +176,12 @@ export class AuthService {
     });
   }
 
-  private generateRefreshToken(userId: string) {
-    return this.jwtService.signAsync({ sub: userId }, { expiresIn: '7d' });
+  private async generateRefreshToken(userId: string): Promise<string> {
+    const token = await this.jwtService.signAsync(
+      { sub: userId },
+      { secret: env.refreshToken, expiresIn: '7d' },
+    );
+
+    return token;
   }
 }
