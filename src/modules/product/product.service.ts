@@ -1,10 +1,19 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/shared/database/prisma.service';
+import { ProductRepository } from 'src/shared/database/repositories/product.repository';
 import { CreateProductDto } from './dto/createProductDto';
+import { UpdateProductDto } from './dto/updateProductDto';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productRepository: ProductRepository,
+  ) {}
 
   async createProduct(createProductDto: CreateProductDto) {
     const { name, price, description, weight, stock, category, imageUrl } =
@@ -35,5 +44,34 @@ export class ProductService {
 
   async getAllProducts() {
     return this.prisma.product.findMany();
+  }
+
+  async deleteProduct(id: string) {
+    const product = await this.prisma.product.findUnique({ where: { id } });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    await this.prisma.product.delete({
+      where: { id },
+    });
+  }
+
+  async updateProduct(id: string, updateProductDto: UpdateProductDto) {
+    const product = await this.productRepository.findUnique({
+      where: { id },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    await this.productRepository.update({
+      where: { id },
+      data: {
+        ...updateProductDto,
+      },
+    });
   }
 }

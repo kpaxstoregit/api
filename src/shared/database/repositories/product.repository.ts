@@ -15,4 +15,8 @@ export class ProductRepository {
   ): Promise<Product | null> {
     return this.prismaService.product.findUnique(findUniqueDto);
   }
+
+  update(updateDto: Prisma.ProductUpdateArgs): Promise<Product> {
+    return this.prismaService.product.update(updateDto);
+  }
 }
