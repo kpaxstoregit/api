@@ -53,3 +53,16 @@ enum Role {
   AFFILIATE
   PREMIUM_CLIENT
 }
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  weight      Float // Peso do produto em gramas
+  stock       Int // Quantidade em estoque
+  category    String // Categoria do cogumelo (ex: Medicinal)
+  imageUrl    String // URL da imagem do produto
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
