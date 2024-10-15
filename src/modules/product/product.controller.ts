@@ -77,4 +77,22 @@ export class ProductController {
       throw error;
     }
   }
+
+  @Get(':id')
+  @IsPublic()
+  @HttpCode(HttpStatus.OK)
+  async findById(@Param('id') id: string) {
+    try {
+      const product = await this.productService.findById(id);
+      return {
+        statusCode: HttpStatus.OK,
+        body: { product },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Product not found');
+      }
+      throw error;
+    }
+  }
 }
