@@ -19,4 +19,10 @@ export class ProductRepository {
   update(updateDto: Prisma.ProductUpdateArgs): Promise<Product> {
     return this.prismaService.product.update(updateDto);
   }
+
+  findById(id: string): Promise<Product | null> {
+    return this.prismaService.product.findUnique({
+      where: { id },
+    });
+  }
 }

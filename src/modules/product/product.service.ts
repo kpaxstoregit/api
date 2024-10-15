@@ -74,4 +74,14 @@ export class ProductService {
       },
     });
   }
+
+  async findById(id: string) {
+    const product = await this.productRepository.findById(id);
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
+  }
 }
