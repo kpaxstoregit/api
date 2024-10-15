@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/shared/database/prisma.service';
 import { CreateProductDto } from './dto/createProductDto';
 
@@ -35,5 +39,17 @@ export class ProductService {
 
   async getAllProducts() {
     return this.prisma.product.findMany();
+  }
+
+  async deleteProduct(id: string) {
+    const product = await this.prisma.product.findUnique({ where: { id } });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    await this.prisma.product.delete({
+      where: { id },
+    });
   }
 }

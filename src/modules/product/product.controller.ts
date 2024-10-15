@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
+  Param,
   Post,
 } from '@nestjs/common';
 
@@ -38,5 +41,19 @@ export class ProductController {
   @IsPublic()
   async getAllProducts() {
     return this.productService.getAllProducts();
+  }
+
+  @Delete(':id')
+  @IsPublic()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteProduct(@Param('id') id: string) {
+    try {
+      await this.productService.deleteProduct(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Product not found');
+      }
+      throw error;
+    }
   }
 }
