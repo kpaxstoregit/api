@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 
 import { ActiveUserId } from 'src/shared/decorators/ActiveUserId';
 import { IsPublic } from 'src/shared/decorators/IsPublic';
+import { ForgotPasswordDto, ResetPasswordDto } from './dto/forgotDto';
 import { RefreshTokenDto } from './dto/refrashTokenDto';
 import { SigninDto } from './dto/signinDto';
 import { SignupDto } from './dto/signup.dto';
@@ -32,5 +33,20 @@ export class AuthController {
   @IsPublic()
   refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshToken(refreshTokenDto.refreshToken);
+  }
+
+  @Post('forgot-password')
+  @IsPublic()
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto.email);
+  }
+
+  @Post('reset-password')
+  @IsPublic()
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword,
+    );
   }
 }
