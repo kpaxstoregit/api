@@ -1,13 +1,18 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcryptjs';
+import * as crypto from 'crypto';
 import { env } from 'src/shared/config/env';
+import { PasswordResetRepository } from 'src/shared/database/repositories/passwordReset.repositories';
 import { RefreshTokenRepository } from 'src/shared/database/repositories/refreshToken.repositories';
 import { UsersRepository } from 'src/shared/database/repositories/users.repositories';
+import { EmailService } from '../email/email.service';
 import { RefreshTokenDto } from './dto/refrashTokenDto';
 import { SigninDto } from './dto/signinDto';
 import { SignupDto } from './dto/signup.dto';
@@ -18,6 +23,8 @@ export class AuthService {
     private readonly userRepo: UsersRepository,
     private readonly jwtService: JwtService,
     private readonly refreshTokenRepository: RefreshTokenRepository,
+    private readonly passwordResetRepo: PasswordResetRepository,
+    private readonly emailService: EmailService,
   ) {}
 
   async signin(signinDto: SigninDto) {
@@ -164,6 +171,57 @@ export class AuthService {
       refreshToken: newRefreshToken,
     };
   }
+
+  async forgotPassword(email: string) {
+    const user = await this.userRepo.findUnique({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 300000);
+
+    await this.passwordResetRepo.create({
+      data: {
+        token,
+        expiresAt,
+        user: { connect: { id: user.id } },
+      },
+    });
+
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    await this.emailService.sendPasswordResetEmail(user.email, resetLink);
+
+    return {
+      message: 'Password reset token generated',
+      resetLink,
+      token,
+    };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const passwordReset = await this.passwordResetRepo.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+
+    if (!passwordReset || passwordReset.expiresAt < new Date()) {
+      throw new BadRequestException('Invalid or expired token');
+    }
+
+    const hashedPassword = await hash(newPassword, 10);
+
+    await this.userRepo.update(
+      { id: passwordReset.userId },
+      { password: hashedPassword },
+    );
+
+    await this.passwordResetRepo.delete({ where: { id: passwordReset.id } });
+
+    return { message: 'Password reset successfully' };
+  }
+
   private generateAccessToken(
     userId: string,
     userRole: string,

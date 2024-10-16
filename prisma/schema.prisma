@@ -17,9 +17,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  resetToken           String?
+  resetTokenExpiration DateTime?
+
   profile       Profile?
   affiliate     Affiliate?
   refreshTokens RefreshToken[]
+  PasswordReset PasswordReset[]
 }
 
 model RefreshToken {
@@ -37,6 +41,15 @@ model Profile {
   bio    String?
   userId String  @unique @db.Uuid
   user   User    @relation(fields: [userId], references: [id])
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now())
 }
 
 model Affiliate {
