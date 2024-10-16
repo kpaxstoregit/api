@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Get, Injectable } from '@nestjs/common';
 import { ContactRepository } from 'src/shared/database/repositories/contact.repository';
+import { IsPublic } from 'src/shared/decorators/IsPublic';
 import { CreateContactDto } from './dto/contact.dto';
 
 @Injectable()
@@ -19,7 +20,10 @@ export class ContactService {
     });
   }
 
+  @Get()
+  @IsPublic()
   async getAllContacts() {
-    return await this.contactRepository.findMany();
+    const contacts = await this.contactRepository.findMany();
+    return { data: contacts };
   }
 }
