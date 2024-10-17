@@ -72,10 +72,10 @@ model Product {
   name        String
   description String
   price       Float
-  weight      Float // Peso do produto em gramas
-  stock       Int // Quantidade em estoque
-  category    String // Categoria do cogumelo (ex: Medicinal)
-  imageUrl    String // URL da imagem do produto
+  weight      Float
+  stock       Int
+  category    String
+  imageUrl    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -85,5 +85,11 @@ model Contact {
   name      String
   email     String
   message   String
+  createdAt DateTime @default(now())
+}
+
+model Newsletter {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
   createdAt DateTime @default(now())
 }

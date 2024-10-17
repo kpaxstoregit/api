@@ -5,6 +5,7 @@ import { AuthGuard } from './modules/auth/auth.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { EmailModule } from './modules/email/email.module';
+import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { ProductModule } from './modules/product/product.module';
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './shared/database/database.module';
@@ -17,6 +18,7 @@ import { DatabaseModule } from './shared/database/database.module';
     ProductModule,
     EmailModule,
     ContactModule,
+    NewsletterModule,
   ],
   controllers: [],
   providers: [
