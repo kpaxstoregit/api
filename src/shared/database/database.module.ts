@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common';
+import { BlogModule } from 'src/modules/blog/blog.module';
 import { ContactModule } from 'src/modules/contact/contact.module';
 import { PrismaService } from './prisma.service';
 import { PasswordResetRepository } from './repositories/passwordReset.repositories';
@@ -15,6 +16,7 @@ import { UsersRepository } from './repositories/users.repositories';
     ProductRepository,
     PasswordResetRepository,
     ContactModule,
+    BlogModule,
   ],
   exports: [
     PrismaService,
@@ -23,6 +25,7 @@ import { UsersRepository } from './repositories/users.repositories';
     ProductRepository,
     PasswordResetRepository,
     ContactModule,
+    BlogModule,
   ],
 })
 export class DatabaseModule {}
