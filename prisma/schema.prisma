@@ -24,6 +24,8 @@ model User {
   affiliate     Affiliate?
   refreshTokens RefreshToken[]
   PasswordReset PasswordReset[]
+  Comment       Comment[]
+  authoredPosts Post[]
 }
 
 model RefreshToken {
@@ -91,5 +93,29 @@ model Contact {
 model Newsletter {
   id        String   @id @default(uuid()) @db.Uuid
   email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id         String    @id @default(uuid()) @db.Uuid
+  title      String
+  content    String
+  authorId   String    @db.Uuid
+  author     User      @relation(fields: [authorId], references: [id])
+  categoryId Int?
+  comments   Comment[]
+  published  Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id       Int    @id @default(autoincrement())
+  content  String
+  postId   String @db.Uuid
+  post     Post   @relation(fields: [postId], references: [id])
+  authorId String @db.Uuid
+  author   User   @relation(fields: [authorId], references: [id])
+
   createdAt DateTime @default(now())
 }

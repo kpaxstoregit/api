@@ -11,6 +11,7 @@ export class NewsletterService {
     const { email } = createNewsletterDto;
 
     const existingSubscription = await this.newsletterRepository.findMany();
+
     const emailExists = existingSubscription.some(
       (subscription) => subscription.email === email,
     );
