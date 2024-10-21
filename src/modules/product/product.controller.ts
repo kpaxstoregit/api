@@ -5,15 +5,12 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
 
 import { IsPublic } from 'src/shared/decorators/IsPublic';
-
-import { ProductAlreadyExists } from 'src/shared/errors/product/ProductAlreadyExists';
 import { CreateProductDto } from './dto/createProductDto';
 import { UpdateProductDto } from './dto/updateProductDto';
 import { ProductService } from './product.service';
@@ -24,40 +21,33 @@ export class ProductController {
 
   @Post()
   @IsPublic()
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.CREATED)
   async createProduct(@Body() createProductDto: CreateProductDto) {
-    try {
-      await this.productService.createProduct(createProductDto);
-    } catch (error) {
-      if (error instanceof ProductAlreadyExists) {
-        return {
-          statusCode: 409,
-          message: 'Product already exists',
-        };
-      }
-
-      throw error;
-    }
+    const product = await this.productService.createProduct(createProductDto);
+    return { data: product };
   }
 
   @Get()
   @IsPublic()
   async getAllProducts() {
-    return this.productService.getAllProducts();
+    const products = await this.productService.getAllProducts();
+    return { data: products };
+  }
+
+  @Get(':id')
+  @IsPublic()
+  @HttpCode(HttpStatus.OK)
+  async findById(@Param('id') id: string) {
+    const product = await this.productService.findById(id);
+    return { data: product };
   }
 
   @Delete(':id')
   @IsPublic()
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteProduct(@Param('id') id: string) {
-    try {
-      await this.productService.deleteProduct(id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('Product not found');
-      }
-      throw error;
-    }
+    await this.productService.deleteProduct(id);
+    return { data: null };
   }
 
   @Put(':id')
@@ -66,33 +56,11 @@ export class ProductController {
   async updateProduct(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
-  ): Promise<{ message: string }> {
-    try {
-      await this.productService.updateProduct(id, updateProductDto);
-      return { message: 'Product updated successfully' };
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('Product not found');
-      }
-      throw error;
-    }
-  }
-
-  @Get(':id')
-  @IsPublic()
-  @HttpCode(HttpStatus.OK)
-  async findById(@Param('id') id: string) {
-    try {
-      const product = await this.productService.findById(id);
-      return {
-        statusCode: HttpStatus.OK,
-        body: { product },
-      };
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('Product not found');
-      }
-      throw error;
-    }
+  ) {
+    const updatedProduct = await this.productService.updateProduct(
+      id,
+      updateProductDto,
+    );
+    return { data: updatedProduct };
   }
 }
