@@ -69,6 +69,11 @@ enum Role {
   PREMIUM_CLIENT
 }
 
+enum ProductStatus {
+  NOVIDADE // ou NEW, dependendo da escolha
+  HOT
+}
+
 model Product {
   id          String   @id @default(uuid())
   name        String
@@ -77,9 +82,21 @@ model Product {
   weight      Float
   stock       Int
   category    String
-  imageUrl    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  imageUrls   String[]
+  title       String // Agora obrigatório
+
+  suggestionOfUse String?
+  benefit         String?
+  composition     String?
+
+  promotion Float?
+
+  status ProductStatus @default(NOVIDADE)
+
+  classification Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Contact {

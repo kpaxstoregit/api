@@ -1,4 +1,21 @@
-import { IsNotEmpty, IsNumber, IsString, IsUrl, Min } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUrl,
+  Max,
+  Min,
+} from 'class-validator';
+
+enum ProductStatus {
+  NOVIDADE = 'NOVIDADE',
+  HOT = 'HOT',
+}
 
 export class CreateProductDto {
   @IsString()
@@ -10,11 +27,11 @@ export class CreateProductDto {
   description: string;
 
   @IsNumber()
-  @Min(0)
+  @IsPositive()
   price: number;
 
   @IsNumber()
-  @Min(0)
+  @IsPositive()
   weight: number;
 
   @IsNumber()
@@ -25,7 +42,38 @@ export class CreateProductDto {
   @IsNotEmpty()
   category: string;
 
-  @IsUrl()
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsUrl({}, { each: true })
+  imageUrls: string[];
+
+  @IsString()
   @IsNotEmpty()
-  imageUrl: string;
+  title: string;
+
+  @IsString()
+  @IsOptional()
+  suggestionOfUse?: string;
+
+  @IsString()
+  @IsOptional()
+  benefit?: string;
+
+  @IsString()
+  @IsOptional()
+  composition?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  promotion?: number;
+
+  @IsEnum(ProductStatus)
+  status: ProductStatus;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(5)
+  classification?: number;
 }

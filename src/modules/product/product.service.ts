@@ -15,9 +15,24 @@ export class ProductService {
     private readonly productRepository: ProductRepository,
   ) {}
 
+  // Método para criar um produto
   async createProduct(createProductDto: CreateProductDto) {
-    const { name, price, description, weight, stock, category, imageUrl } =
-      createProductDto;
+    const {
+      name,
+      price,
+      description,
+      weight,
+      stock,
+      category,
+      imageUrls,
+      title,
+      suggestionOfUse,
+      benefit,
+      composition,
+      promotion,
+      status,
+      classification,
+    } = createProductDto;
 
     const productExists = await this.prisma.product.findFirst({
       where: { name },
@@ -35,7 +50,14 @@ export class ProductService {
         weight,
         stock,
         category,
-        imageUrl,
+        imageUrls,
+        title,
+        suggestionOfUse,
+        benefit,
+        composition,
+        promotion,
+        status,
+        classification,
       },
     });
 
@@ -59,6 +81,23 @@ export class ProductService {
   }
 
   async updateProduct(id: string, updateProductDto: UpdateProductDto) {
+    const {
+      name,
+      price,
+      description,
+      weight,
+      stock,
+      category,
+      imageUrls,
+      title,
+      suggestionOfUse,
+      benefit,
+      composition,
+      promotion,
+      status,
+      classification,
+    } = updateProductDto;
+
     const product = await this.productRepository.findUnique({
       where: { id },
     });
@@ -70,11 +109,25 @@ export class ProductService {
     await this.productRepository.update({
       where: { id },
       data: {
-        ...updateProductDto,
+        name,
+        price,
+        description,
+        weight,
+        stock,
+        category,
+        imageUrls,
+        title,
+        suggestionOfUse,
+        benefit,
+        composition,
+        promotion,
+        status,
+        classification,
       },
     });
   }
 
+  // Método para buscar um produto por ID
   async findById(id: string) {
     const product = await this.productRepository.findById(id);
 
