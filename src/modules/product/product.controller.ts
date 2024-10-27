@@ -31,36 +31,36 @@ export class ProductController {
   @IsPublic()
   async getAllProducts() {
     const products = await this.productService.getAllProducts();
-    return { data: products };
+    return products;
   }
 
-  @Get(':id')
+  @Get(':slug')
   @IsPublic()
   @HttpCode(HttpStatus.OK)
-  async findById(@Param('id') id: string) {
-    const product = await this.productService.findById(id);
-    return { data: product };
+  async findBySlug(@Param('slug') slug: string) {
+    const product = await this.productService.getProduct(slug);
+    return product;
   }
 
-  @Delete(':id')
+  @Delete(':slug')
   @IsPublic()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteProduct(@Param('id') id: string) {
-    await this.productService.deleteProduct(id);
-    return { data: null };
+  async deleteProduct(@Param('slug') slug: string) {
+    const produtctId = await this.productService.deleteProduct(slug);
+    return produtctId;
   }
 
-  @Put(':id')
+  @Put(':slug')
   @IsPublic()
   @HttpCode(HttpStatus.OK)
   async updateProduct(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    const updatedProduct = await this.productService.updateProduct(
-      id,
-      updateProductDto,
-    );
-    return { data: updatedProduct };
+    const updatedProduct = await this.productService.updateProduct({
+      ...updateProductDto,
+      slug,
+    });
+    return updatedProduct;
   }
 }
