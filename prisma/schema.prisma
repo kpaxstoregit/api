@@ -75,28 +75,24 @@ enum ProductStatus {
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Float
-  weight      Float
-  stock       Int
-  category    String
-  imageUrls   String[]
-  title       String // Agora obrigatório
-
-  suggestionOfUse String?
-  benefit         String?
-  composition     String?
-
-  promotion Float?
-
-  status ProductStatus @default(NOVIDADE)
-
-  classification Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String        @id @default(uuid())
+  name            String
+  description     String
+  price           Float
+  weight          Float
+  stock           Int
+  category        String
+  imageUrls       String[]
+  title           String
+  suggestionOfUse String
+  benefit         String
+  composition     String
+  promotion       Float?
+  status          ProductStatus @default(NOVIDADE)
+  classification  Int?
+  slug            String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model Contact {

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -15,7 +16,6 @@ export class ProductService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  // Método para criar um produto
   async createProduct(createProductDto: CreateProductDto) {
     const {
       name,
@@ -32,6 +32,7 @@ export class ProductService {
       promotion,
       status,
       classification,
+      slug,
     } = createProductDto;
 
     const productExists = await this.prisma.product.findFirst({
@@ -58,6 +59,7 @@ export class ProductService {
         promotion,
         status,
         classification,
+        slug,
       },
     });
 
@@ -68,19 +70,19 @@ export class ProductService {
     return this.prisma.product.findMany();
   }
 
-  async deleteProduct(id: string) {
-    const product = await this.prisma.product.findUnique({ where: { id } });
+  async deleteProduct(slug: string) {
+    const product = await this.prisma.product.findUnique({ where: { slug } });
 
     if (!product) {
       throw new NotFoundException('Product not found');
     }
 
     await this.prisma.product.delete({
-      where: { id },
+      where: { slug },
     });
   }
 
-  async updateProduct(id: string, updateProductDto: UpdateProductDto) {
+  async updateProduct(updateProductDto: UpdateProductDto) {
     const {
       name,
       price,
@@ -96,10 +98,11 @@ export class ProductService {
       promotion,
       status,
       classification,
+      slug,
     } = updateProductDto;
 
     const product = await this.productRepository.findUnique({
-      where: { id },
+      where: { slug },
     });
 
     if (!product) {
@@ -107,7 +110,7 @@ export class ProductService {
     }
 
     await this.productRepository.update({
-      where: { id },
+      where: { slug },
       data: {
         name,
         price,
@@ -127,9 +130,14 @@ export class ProductService {
     });
   }
 
-  // Método para buscar um produto por ID
-  async findById(id: string) {
-    const product = await this.productRepository.findById(id);
+  async getProduct(slug: string) {
+    if (!slug) {
+      throw new BadRequestException('Slug is required');
+    }
+
+    const product = await this.productRepository.findUnique({
+      where: { slug },
+    });
 
     if (!product) {
       throw new NotFoundException('Product not found');

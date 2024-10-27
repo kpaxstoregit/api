@@ -63,6 +63,9 @@ export class CreateProductDto {
   @IsOptional()
   composition?: string;
 
+  @IsString()
+  slug: string;
+
   @IsNumber()
   @IsOptional()
   @Min(0)
