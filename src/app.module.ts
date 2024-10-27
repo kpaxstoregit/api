@@ -5,6 +5,7 @@ import { AuthGuard } from './modules/auth/auth.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { ContactModule } from './modules/contact/contact.module';
+import { CouponModule } from './modules/cupom/coupon.module';
 import { EmailModule } from './modules/email/email.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { ProductModule } from './modules/product/product.module';
@@ -21,6 +22,7 @@ import { DatabaseModule } from './shared/database/database.module';
     ContactModule,
     NewsletterModule,
     BlogModule,
+    CouponModule,
   ],
   controllers: [],
   providers: [
