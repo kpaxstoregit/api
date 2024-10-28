@@ -26,6 +26,20 @@ model User {
   PasswordReset PasswordReset[]
   Comment       Comment[]
   authoredPosts Post[]
+  cart          Cart?
+
+  notificationPreferences NotificationPreferences?
+}
+
+model NotificationPreferences {
+  id                String   @id @default(uuid()) @db.Uuid
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String   @unique @db.Uuid
+  emailNotification Boolean  @default(false)
+  smsNotification   Boolean  @default(false)
+  lightMode         Boolean  @default(false)
+  updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now())
 }
 
 model RefreshToken {
@@ -70,12 +84,12 @@ enum Role {
 }
 
 enum ProductStatus {
-  NOVIDADE // ou NEW, dependendo da escolha
+  NOVIDADE
   HOT
 }
 
 model Product {
-  id              String        @id @default(uuid())
+  id              String        @id @default(uuid()) @db.Uuid
   name            String
   description     String
   price           Float
@@ -94,6 +108,7 @@ model Product {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   coupons         Coupon[]      @relation("ProductCoupons")
+  cartItems       CartItem[]
 }
 
 model Coupon {
@@ -107,6 +122,30 @@ model Coupon {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   products      Product[] @relation("ProductCoupons")
+}
+
+model Cart {
+  id         String     @id @default(uuid()) @db.Uuid
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String     @unique @db.Uuid
+  cartItems  CartItem[]
+  totalPrice Float      @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  cartId    String   @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String   @db.Uuid
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
 }
 
 model Contact {

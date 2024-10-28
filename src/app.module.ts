@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './modules/auth/auth.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { BlogModule } from './modules/blog/blog.module';
+import { CartModule } from './modules/cart/cart.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { CouponModule } from './modules/cupom/coupon.module';
 import { EmailModule } from './modules/email/email.module';
@@ -23,6 +24,7 @@ import { DatabaseModule } from './shared/database/database.module';
     NewsletterModule,
     BlogModule,
     CouponModule,
+    CartModule,
   ],
   controllers: [],
   providers: [
