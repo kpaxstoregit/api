@@ -13,6 +13,7 @@ import { PasswordResetRepository } from 'src/shared/database/repositories/passwo
 import { RefreshTokenRepository } from 'src/shared/database/repositories/refreshToken.repositories';
 import { UsersRepository } from 'src/shared/database/repositories/users.repositories';
 import { EmailService } from '../email/email.service';
+import { ChangePasswordDto } from './dto/changePasswordDto';
 import { RefreshTokenDto } from './dto/refrashTokenDto';
 import { SigninDto } from './dto/signinDto';
 import { SignupDto } from './dto/signup.dto';
@@ -220,6 +221,31 @@ export class AuthService {
     await this.passwordResetRepo.delete({ where: { id: passwordReset.id } });
 
     return { message: 'Password reset successfully' };
+  }
+
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    const { currentPassword, newPassword } = changePasswordDto;
+
+    // Verifica o usuário pelo ID
+    const user = await this.userRepo.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Valida a senha atual
+    const isCurrentPasswordValid = await compare(
+      currentPassword,
+      user.password,
+    );
+    if (!isCurrentPasswordValid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    // Gera o hash da nova senha e atualiza o usuário
+    const hashedNewPassword = await hash(newPassword, 10);
+    await this.userRepo.update({ id: userId }, { password: hashedNewPassword });
+
+    return { message: 'Password changed successfully' };
   }
 
   private generateAccessToken(
