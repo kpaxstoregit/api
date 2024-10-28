@@ -9,6 +9,7 @@ import { ContactModule } from './modules/contact/contact.module';
 import { CouponModule } from './modules/cupom/coupon.module';
 import { EmailModule } from './modules/email/email.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
+import { NotificationPreferencesModule } from './modules/notification/notification-preferences.module';
 import { ProductModule } from './modules/product/product.module';
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './shared/database/database.module';
@@ -25,6 +26,7 @@ import { DatabaseModule } from './shared/database/database.module';
     BlogModule,
     CouponModule,
     CartModule,
+    NotificationPreferencesModule,
   ],
   controllers: [],
   providers: [
