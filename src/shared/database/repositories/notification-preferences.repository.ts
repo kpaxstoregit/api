@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+// src/shared/database/repositories/notification-preferences.repository.ts
+
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 
@@ -6,19 +8,33 @@ import { PrismaService } from '../prisma.service';
 export class NotificationPreferencesRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(createDto: Prisma.NotificationPreferencesCreateArgs) {
+  async create(createDto: Prisma.NotificationPreferencesCreateArgs) {
     return this.prismaService.notificationPreferences.create(createDto);
   }
 
-  findUnique(findUniqueDto: Prisma.NotificationPreferencesFindUniqueArgs) {
-    return this.prismaService.notificationPreferences.findUnique(findUniqueDto);
+  async findUniqueByUserId(userId: string) {
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
+    return this.prismaService.notificationPreferences.findUnique({
+      where: { userId },
+    });
   }
 
-  update(updateDto: Prisma.NotificationPreferencesUpdateArgs) {
-    return this.prismaService.notificationPreferences.update(updateDto);
+  async update(
+    userId: string,
+    data: Prisma.NotificationPreferencesUpdateInput,
+  ) {
+    if (!userId) {
+      throw new BadRequestException('User ID is required for updating');
+    }
+    return this.prismaService.notificationPreferences.update({
+      where: { userId },
+      data,
+    });
   }
 
-  upsert(upsertDto: Prisma.NotificationPreferencesUpsertArgs) {
+  async upsert(upsertDto: Prisma.NotificationPreferencesUpsertArgs) {
     return this.prismaService.notificationPreferences.upsert(upsertDto);
   }
 }

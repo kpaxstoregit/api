@@ -1,4 +1,6 @@
-import { IsBoolean, IsOptional } from 'class-validator';
+// src/notification-preferences/dto/update-notification-preferences.dto.ts
+
+import { IsBoolean, IsIn, IsOptional } from 'class-validator';
 
 export class UpdateNotificationPreferencesDto {
   @IsOptional()
@@ -10,6 +12,8 @@ export class UpdateNotificationPreferencesDto {
   smsNotification?: boolean;
 
   @IsOptional()
-  @IsBoolean()
-  lightMode?: boolean;
+  @IsIn(['Light', 'Dark'], {
+    message: 'Theme must be either "Light" or "Dark"',
+  })
+  theme?: string;
 }
