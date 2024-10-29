@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+// src/notification-preferences/notification-preferences.service.ts
+
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { NotificationPreferencesRepository } from 'src/shared/database/repositories/notification-preferences.repository';
-import { UpdateNotificationPreferencesDto } from './dto/update-notification-preferences.dto';
 
 @Injectable()
 export class NotificationPreferencesService {
@@ -8,28 +9,39 @@ export class NotificationPreferencesService {
     private readonly preferencesRepository: NotificationPreferencesRepository,
   ) {}
 
-  async getPreferences(userId: string) {
+  async getUserPreferences(userId: string) {
     const preferences = await this.preferencesRepository.upsert({
       where: { userId },
-      update: {},
       create: {
         userId,
         emailNotification: false,
         smsNotification: false,
-        lightMode: false,
+        theme: 'Light',
       },
+      update: {},
     });
+
     return preferences;
   }
 
-  async updatePreferences(
-    userId: string,
-    updateDto: UpdateNotificationPreferencesDto,
-  ) {
-    return this.preferencesRepository.upsert({
-      where: { userId },
-      update: updateDto,
-      create: { userId, ...updateDto },
-    });
+  async updateEmailNotification(userId: string, emailNotification: boolean) {
+    if (emailNotification === undefined) {
+      throw new BadRequestException('Email notification status is required');
+    }
+    return this.preferencesRepository.update(userId, { emailNotification });
+  }
+
+  async updateSmsNotification(userId: string, smsNotification: boolean) {
+    if (smsNotification === undefined) {
+      throw new BadRequestException('SMS notification status is required');
+    }
+    return this.preferencesRepository.update(userId, { smsNotification });
+  }
+
+  async updateTheme(userId: string, theme: string) {
+    if (theme !== 'Light' && theme !== 'Dark') {
+      throw new BadRequestException('Theme must be either "Light" or "Dark"');
+    }
+    return this.preferencesRepository.update(userId, { theme });
   }
 }

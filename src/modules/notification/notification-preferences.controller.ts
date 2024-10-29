@@ -1,29 +1,51 @@
-import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
+// src/notification-preferences/notification-preferences.controller.ts
 
-import { AuthGuard } from 'src/modules/auth/auth.guard';
-import { IsPublic } from 'src/shared/decorators/IsPublic';
+import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { ActiveUserId } from 'src/shared/decorators/ActiveUserId';
 import { UpdateNotificationPreferencesDto } from './dto/update-notification-preferences.dto';
 import { NotificationPreferencesService } from './notification-preferences.service';
 
 @Controller('notification-preferences')
-@UseGuards(AuthGuard)
 export class NotificationPreferencesController {
   constructor(
     private readonly preferencesService: NotificationPreferencesService,
   ) {}
 
-  @Get(':userId')
-  @IsPublic()
-  async getPreferences(@Param('userId') userId: string) {
-    return this.preferencesService.getPreferences(userId);
+  @Get()
+  async getUserPreferences(@ActiveUserId() userId: string) {
+    return this.preferencesService.getUserPreferences(userId);
   }
 
-  @Put(':userId')
-  @IsPublic()
-  async updatePreferences(
-    @Param('userId') userId: string,
-    @Body() updateDto: UpdateNotificationPreferencesDto,
+  // Atualiza notificação por e-mail
+  @Patch('email-notification')
+  async updateEmailNotification(
+    @ActiveUserId() userId: string,
+    @Body() { emailNotification }: UpdateNotificationPreferencesDto,
   ) {
-    return this.preferencesService.updatePreferences(userId, updateDto);
+    return this.preferencesService.updateEmailNotification(
+      userId,
+      emailNotification,
+    );
+  }
+
+  // Atualiza notificação por SMS
+  @Patch('sms-notification')
+  async updateSmsNotification(
+    @ActiveUserId() userId: string,
+    @Body() { smsNotification }: UpdateNotificationPreferencesDto,
+  ) {
+    return this.preferencesService.updateSmsNotification(
+      userId,
+      smsNotification,
+    );
+  }
+
+  // Atualiza o tema
+  @Patch('theme')
+  async updateTheme(
+    @ActiveUserId() userId: string,
+    @Body() { theme }: UpdateNotificationPreferencesDto,
+  ) {
+    return this.preferencesService.updateTheme(userId, theme);
   }
 }

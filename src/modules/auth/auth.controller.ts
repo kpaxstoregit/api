@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 
 import { ActiveUserId } from 'src/shared/decorators/ActiveUserId';
 import { IsPublic } from 'src/shared/decorators/IsPublic';
+import { ChangePasswordDto } from './dto/changePasswordDto';
 import { ForgotPasswordDto, ResetPasswordDto } from './dto/forgotDto';
 import { RefreshTokenDto } from './dto/refrashTokenDto';
 import { SigninDto } from './dto/signinDto';
@@ -48,5 +49,13 @@ export class AuthController {
       resetPasswordDto.token,
       resetPasswordDto.newPassword,
     );
+  }
+
+  @Post('change-password')
+  async changePassword(
+    @ActiveUserId() userId: string,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(userId, changePasswordDto);
   }
 }
