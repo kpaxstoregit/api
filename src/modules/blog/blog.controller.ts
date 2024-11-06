@@ -1,17 +1,18 @@
+// src/posts/posts.controller.ts
 import {
-  Body,
   Controller,
-  Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Body,
+  Put,
+  Delete,
+  Query,
 } from '@nestjs/common';
 
-import { BlogService } from 'src/shared/database/repositories/blog/blog.repositories';
+import { Post as PostModel, Prisma } from '@prisma/client';
+import { BlogService } from './blog.service';
 import { IsPublic } from 'src/shared/decorators/IsPublic';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('blog')
 export class BlogController {
@@ -19,42 +20,47 @@ export class BlogController {
 
   @Get()
   @IsPublic()
-  async getAllPosts() {
-    const posts = await this.blogService.getAllPosts();
-
-    return {
-      data: posts,
-    };
+  async getPosts(
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+    @Query('orderBy') orderBy?: string,
+  ): Promise<PostModel[]> {
+    return this.blogService.posts({
+      skip: skip ? parseInt(skip) : undefined,
+      take: take ? parseInt(take) : undefined,
+      orderBy: orderBy ? { [orderBy]: 'desc' } : undefined,
+    });
   }
 
   @Get(':id')
   @IsPublic()
-  async getPostById(@Param('id') postId: string) {
-    return this.blogService.getPostById(postId);
+  async getPostById(@Param('id') id: string): Promise<PostModel> {
+    return this.blogService.post({ id });
   }
 
   @Post()
   @IsPublic()
-  async createPost(@Body() createPostDto: CreatePostDto) {
-    const post = await this.blogService.createPost(createPostDto);
-
-    return {
-      data: post,
-    };
+  async createPost(
+    @Body() postData: Prisma.PostCreateInput,
+  ): Promise<PostModel> {
+    return this.blogService.createPost(postData);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @IsPublic()
   async updatePost(
-    @Param('id') postId: string,
-    @Body() updatePostDto: UpdatePostDto,
-  ) {
-    return this.blogService.updatePost(postId, updatePostDto);
+    @Param('id') id: string,
+    @Body() postData: Prisma.PostUpdateInput,
+  ): Promise<PostModel> {
+    return this.blogService.updatePost({
+      where: { id },
+      data: postData,
+    });
   }
 
   @Delete(':id')
   @IsPublic()
-  async deletePost(@Param('id') postId: string) {
-    return this.blogService.deletePost(postId);
+  async deletePost(@Param('id') id: string): Promise<PostModel> {
+    return this.blogService.deletePost({ id });
   }
 }

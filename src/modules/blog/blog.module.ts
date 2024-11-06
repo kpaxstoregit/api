@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { BlogService } from 'src/shared/database/repositories/blog/blog.repositories';
 import { BlogController } from './blog.controller';
-import { BlogRepository } from './blog.service';
+import { BlogService } from './blog.service';
+import { BlogRepository } from 'src/shared/database/repositories/blog/blog.repositories';
 
 @Module({
   controllers: [BlogController],
