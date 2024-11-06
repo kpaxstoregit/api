@@ -32,10 +32,10 @@ export class BlogController {
     });
   }
 
-  @Get(':id')
+  @Get(':slug')
   @IsPublic()
-  async getPostById(@Param('id') id: string): Promise<PostModel> {
-    return this.blogService.post({ id });
+  async getPostBySlug(@Param('slug') slug: string): Promise<PostModel> {
+    return this.blogService.post({ slug });
   }
 
   @Post()
