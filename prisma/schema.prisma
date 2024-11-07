@@ -166,16 +166,24 @@ model Newsletter {
 }
 
 model Post {
-  id         String    @id @default(uuid()) @db.Uuid
-  title      String
-  content    String
-  authorId   String    @db.Uuid
-  author     User      @relation(fields: [authorId], references: [id])
-  categoryId Int?
-  comments   Comment[]
-  published  Boolean   @default(false)
-
-  createdAt DateTime @default(now())
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  image        String
+  author       User      @relation(fields: [authorId], references: [id])
+  authorId     String    @db.Uuid
+  authorAvatar String?
+  authorBio    String?
+  date         DateTime
+  readingTime  Int
+  tags         String[]
+  benefits     Json?
+  content      String
+  references   String[]
+  slug         String    @unique
+  published    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  Comment      Comment[]
 }
 
 model Comment {

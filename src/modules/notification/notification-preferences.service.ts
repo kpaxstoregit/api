@@ -1,5 +1,3 @@
-// src/notification-preferences/notification-preferences.service.ts
-
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { NotificationPreferencesRepository } from 'src/shared/database/repositories/notification-preferences.repository';
 

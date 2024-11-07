@@ -1,58 +1,41 @@
+// src/posts/posts.service.ts
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from 'src/shared/database/prisma.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { Post, Prisma } from '@prisma/client';
+import { BlogRepository } from 'src/shared/database/repositories/blog/blog.repositories';
 
 @Injectable()
-export class BlogRepository {
-  constructor(private readonly prisma: PrismaService) {}
+export class BlogService {
+  constructor(private readonly postsRepository: BlogRepository) {}
 
-  async findAll() {
-    return this.prisma.post.findMany({
-      include: {
-        author: {
-          select: {
-            email: true,
-            name: true,
-          },
-        },
-        comments: true,
-      },
-    });
-  }
-  async findById(postId: string) {
-    return this.prisma.post.findUnique({
-      where: { id: postId },
-      include: {
-        author: true,
-        comments: true,
-      },
-    });
+  async post(
+    postWhereUniqueInput: Prisma.PostWhereUniqueInput,
+  ): Promise<Post | null> {
+    return this.postsRepository.findUnique(postWhereUniqueInput);
   }
 
-  async create(data: CreatePostDto) {
-    return this.prisma.post.create({
-      data: {
-        title: data.title,
-        content: data.content,
-        author: {
-          connect: { id: data.authorId },
-        },
-      },
-    });
+  async posts(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.PostWhereUniqueInput;
+    where?: Prisma.PostWhereInput;
+    orderBy?: Prisma.PostOrderByWithRelationInput;
+  }): Promise<Post[]> {
+    return this.postsRepository.findMany(params);
   }
 
-  async update(postId: string, data: UpdatePostDto) {
-    return this.prisma.post.update({
-      where: { id: postId },
-      data,
-    });
+  async createPost(data: Prisma.PostCreateInput): Promise<Post> {
+    return this.postsRepository.create(data);
   }
 
-  async delete(postId: string) {
-    return this.prisma.post.delete({
-      where: { id: postId },
-    });
+  async updatePost(params: {
+    where: Prisma.PostWhereUniqueInput;
+    data: Prisma.PostUpdateInput;
+  }): Promise<Post> {
+    return this.postsRepository.update(params);
+  }
+
+  async deletePost(where: Prisma.PostWhereUniqueInput): Promise<Post> {
+    return this.postsRepository.delete(where);
   }
 }
