@@ -248,6 +248,11 @@ export class AuthService {
     return { message: 'Password changed successfully' };
   }
 
+  async checkEmailExists(email: string) {
+    const user = await this.userRepo.findUnique({ where: { email } });
+    return { exists: !!user };
+  }
+
   private generateAccessToken(
     userId: string,
     userRole: string,

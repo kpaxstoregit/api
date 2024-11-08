@@ -30,6 +30,12 @@ export class AuthController {
     return this.authService.logout(userId, logoutDto);
   }
 
+  @Post('check-email')
+  @IsPublic()
+  async checkEmailExists(@Body('email') email: string) {
+    return this.authService.checkEmailExists(email);
+  }
+
   @Post('refresh-token')
   @IsPublic()
   refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
