@@ -5,33 +5,30 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("SUPABASE_URL")
 }
 
 model User {
-  id          String   @id @default(uuid()) @db.Uuid
-  email       String   @unique
-  password    String
-  name        String
-  lastName    String?
-  phoneNumber String?
-  role        Role     @default(CLIENT)
-  isPremium   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  resetToken           String?
-  resetTokenExpiration DateTime?
-
-  profile                   Profile?
-  affiliate                 Affiliate?
-  refreshTokens             RefreshToken[]
-  PasswordReset             PasswordReset[]
-  Comment                   Comment[]
-  authoredPosts             Post[]
-  cart                      Cart?
-  notificationPreferences   NotificationPreferences? @relation("UserNotificationPreferences")
+  id                        String                   @id @default(uuid()) @db.Uuid
+  email                     String                   @unique
+  password                  String
+  name                      String
+  lastName                  String?
+  phoneNumber               String?
+  role                      Role                     @default(CLIENT)
+  isPremium                 Boolean                  @default(false)
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+  resetToken                String?
+  resetTokenExpiration      DateTime?
   notificationPreferencesId String?                  @db.Uuid
+  affiliate                 Affiliate?
+  cart                      Cart?
+  Comment                   Comment[]
+  notificationPreferences   NotificationPreferences? @relation("UserNotificationPreferences")
+  PasswordReset             PasswordReset[]
+  authoredPosts             Post[]
+  profile                   Profile?
+  refreshTokens             RefreshToken[]
 }
 
 model NotificationPreferences {
@@ -42,18 +39,17 @@ model NotificationPreferences {
   theme             String   @default("Light")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
-  user User @relation("UserNotificationPreferences", fields: [userId], references: [id])
+  user              User     @relation("UserNotificationPreferences", fields: [userId], references: [id])
 }
 
 model RefreshToken {
   id        String   @id @default(uuid()) @db.Uuid
   token     String   @unique
-  user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.Uuid
   expiresAt DateTime
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Profile {
@@ -67,29 +63,17 @@ model PasswordReset {
   id        String   @id @default(uuid())
   token     String   @unique
   expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.Uuid
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Affiliate {
   id             String @id @default(uuid()) @db.Uuid
   userId         String @unique @db.Uuid
-  user           User   @relation(fields: [userId], references: [id])
   code           String @unique
   commissionRate Float
-}
-
-enum Role {
-  ADMIN
-  CLIENT
-  AFFILIATE
-  PREMIUM_CLIENT
-}
-
-enum ProductStatus {
-  NOVIDADE
-  HOT
+  user           User   @relation(fields: [userId], references: [id])
 }
 
 model Product {
@@ -111,8 +95,8 @@ model Product {
   slug            String?       @unique
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  coupons         Coupon[]      @relation("ProductCoupons")
   cartItems       CartItem[]
+  coupons         Coupon[]      @relation("ProductCoupons")
 }
 
 model Coupon {
@@ -130,24 +114,24 @@ model Coupon {
 
 model Cart {
   id         String     @id @default(uuid()) @db.Uuid
-  user       User       @relation(fields: [userId], references: [id])
   userId     String     @unique @db.Uuid
-  cartItems  CartItem[]
   totalPrice Float      @default(0)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+  user       User       @relation(fields: [userId], references: [id])
+  cartItems  CartItem[]
 }
 
 model CartItem {
   id        String   @id @default(uuid()) @db.Uuid
-  cart      Cart     @relation(fields: [cartId], references: [id])
   cartId    String   @db.Uuid
-  product   Product  @relation(fields: [productId], references: [id])
   productId String   @db.Uuid
   quantity  Int
   price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 
   @@unique([cartId, productId])
 }
@@ -169,31 +153,42 @@ model Newsletter {
 model Post {
   id           String    @id @default(uuid()) @db.Uuid
   title        String
-  image        String
-  author       User      @relation(fields: [authorId], references: [id])
-  authorId     String    @db.Uuid
-  authorAvatar String?
-  authorBio    String?
-  date         DateTime
-  readingTime  Int
-  tags         String[]
-  benefits     Json?
   content      String
-  references   String[]
-  slug         String    @unique
+  authorId     String    @db.Uuid
   published    Boolean   @default(false)
   createdAt    DateTime  @default(now())
+  authorAvatar String?
+  authorBio    String?
+  benefits     Json?
+  date         DateTime
+  image        String
+  readingTime  Int
+  references   String[]
+  slug         String    @unique
+  tags         String[]
   updatedAt    DateTime  @updatedAt
   Comment      Comment[]
+  author       User      @relation(fields: [authorId], references: [id])
 }
 
 model Comment {
-  id       Int    @id @default(autoincrement())
-  content  String
-  postId   String @db.Uuid
-  post     Post   @relation(fields: [postId], references: [id])
-  authorId String @db.Uuid
-  author   User   @relation(fields: [authorId], references: [id])
-
+  id        Int      @id @default(autoincrement())
+  content   String
+  postId    String   @db.Uuid
+  authorId  String   @db.Uuid
   createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+  AFFILIATE
+  PREMIUM_CLIENT
+}
+
+enum ProductStatus {
+  NOVIDADE
+  HOT
 }
