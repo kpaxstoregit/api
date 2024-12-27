@@ -6,10 +6,8 @@ export class SupabaseService {
   private readonly supabase: SupabaseClient;
 
   constructor() {
-    const supabaseUrl =
-      'postgresql://postgres:2BUJQvNO3Iy4D2o7@db.ckegikmmxzzqxrstwwob.supabase.co:5432/postgres';
-    const supabaseKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrZWdpa21teHp6cXhyc3R3d29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0Njg0NjMsImV4cCI6MjA1MDA0NDQ2M30.b0a-XP1w97nk9quSifc59Ae3PAgmcHPlXgvHns4cRXk';
+    const supabaseUrl = process.env.DATABASE_URL;
+    const supabaseKey = process.env.SUPABASE_KEY;
 
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
