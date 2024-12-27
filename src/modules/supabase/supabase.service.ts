@@ -10,7 +10,7 @@ export class SupabaseService {
 
   constructor() {
     // Instanciando o cliente do Supabase
-    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseUrl = 'https://ckegikmmxzzqxrstwwob.supabase.co';
 
     const supabaseKey = process.env.SUPABASE_KEY;
     this.supabase = createClient(supabaseUrl, supabaseKey);
