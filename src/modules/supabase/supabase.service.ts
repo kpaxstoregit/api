@@ -1,30 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import * as dotenv from 'dotenv';
+
+dotenv.config(); // Carregar variáveis de ambiente
 
 @Injectable()
 export class SupabaseService {
-  private readonly supabase: SupabaseClient;
+  private supabase;
 
   constructor() {
+    // Instanciando o cliente do Supabase
     const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_KEY;
 
+    const supabaseKey = process.env.SUPABASE_KEY;
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  async testConnection(): Promise<boolean> {
-    try {
-      // Tente listar tabelas do banco de dados (ou qualquer query)
-      const { data, error } = await this.supabase
-        .from('Newsletter')
-        .select('*');
-      if (error) throw error;
-
-      console.log('Conexão bem-sucedida:', data);
-      return true;
-    } catch (error) {
-      console.error('Erro ao conectar ao Supabase:', error.message);
-      return false;
+  // Exemplo de método para buscar dados
+  async getData(tableName: string) {
+    const { data, error } = await this.supabase.from(tableName).select('*');
+    if (error) {
+      throw new Error(`Erro ao buscar dados: ${error.message}`);
     }
+    return data;
+  }
+
+  // Exemplo de método para inserir dados
+  async insertData(tableName: string, data: any) {
+    const { data: insertedData, error } = await this.supabase
+      .from(tableName)
+      .insert([data]);
+    if (error) {
+      throw new Error(`Erro ao inserir dados: ${error.message}`);
+    }
+    return insertedData;
   }
 }

@@ -12,7 +12,7 @@ import { NotificationPreferencesModule } from './modules/notification/notificati
 import { ProductModule } from './modules/product/product.module';
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './shared/database/database.module';
-import { SupabaseService } from './modules/supabase/supabase.service';
+import { SupabaseModule } from './modules/supabase/supabase.module';
 
 @Module({
   imports: [
@@ -27,6 +27,7 @@ import { SupabaseService } from './modules/supabase/supabase.service';
     CouponModule,
     CartModule,
     NotificationPreferencesModule,
+    SupabaseModule,
   ],
   controllers: [],
   providers: [
@@ -34,7 +35,6 @@ import { SupabaseService } from './modules/supabase/supabase.service';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    SupabaseService,
   ],
 })
 export class AppModule {}
