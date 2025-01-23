@@ -137,6 +137,19 @@ model CartItem {
   @@unique([cartId, productId])
 }
 
+model HistoryOrder {
+  id             String @id @default(cuid())
+  customer       String
+  email          String
+  paymentStatus  String
+  orderStatus    String
+  paymentMethod  String
+  avatar         String
+  spentTotal     Float
+  productsBought Json
+  orderDetails   Json?
+}
+
 model Contact {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
