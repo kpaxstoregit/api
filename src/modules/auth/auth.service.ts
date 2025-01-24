@@ -12,7 +12,8 @@ import { env } from 'src/shared/config/env';
 import { PasswordResetRepository } from 'src/shared/database/repositories/passwordReset.repositories';
 import { RefreshTokenRepository } from 'src/shared/database/repositories/refreshToken.repositories';
 import { UsersRepository } from 'src/shared/database/repositories/users.repositories';
-import { EmailService } from '../email/email.service';
+
+import { EmailService } from '../email/emailSend.service';
 import { ChangePasswordDto } from './dto/changePasswordDto';
 import { RefreshTokenDto } from './dto/refrashTokenDto';
 import { SigninDto } from './dto/signinDto';
