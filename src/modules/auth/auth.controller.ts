@@ -32,7 +32,9 @@ export class AuthController {
 
   @Post('check-email')
   @IsPublic()
-  async checkEmailExists(@Body('email') email: string) {
+  async checkEmailExists(
+    @Body('email') email: string,
+  ): Promise<{ exists: boolean }> {
     return this.authService.checkEmailExists(email);
   }
 
